@@ -31,7 +31,8 @@ public class Token {
         Mas,
         enie,
         cadena,
-        coma
+        coma,
+        aceptacion
     }
     
     private Tipo tipoToken;
@@ -101,6 +102,10 @@ public class Token {
                 return "Cadena";
             case coma:
                 return "Símbolo coma";
+            case Flecha:
+                return "Flecha";
+            case aceptacion:
+                return "Simbolo Aceptación";
             default:
                 return "desconocido";
         }
@@ -146,8 +151,12 @@ public class Token {
                 return 18;
             case coma:
                 return 19;
-            default:
+            case Flecha:
                 return 20;
+            case aceptacion:
+                return 21;
+            default:
+                return 22;
         }
     }
     

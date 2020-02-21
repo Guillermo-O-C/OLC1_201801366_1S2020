@@ -13,24 +13,41 @@ import java.io.FileWriter;
  * @author Guillermo
  */
 public class AnalizadorLexico {
-     public static LinkedList<Errores> Error;
+        private LinkedList<Errores> Error;
         private LinkedList<Token> Salida;
+        private LinkedList<Conjunto> Conjuntos;
+        private LinkedList<ExpresionRegular> ExpresionesRegulares;
         private int estado;
         private int fila;
         private int columna;
         private int columnaToken;
         private String auxlex;
+        private boolean Lexemas;
+        private int conjunto;
+        private int expr;
+        private String conjuntoID;
+        private String conjuntoCONTENT;
+        private String expresion;
+        private String expID;
 
-
-    public LinkedList<Token> escanear(String entrada)
+    public ListasAnalisis escanear(String entrada)
     {
         entrada = entrada + "#";
         Salida = new LinkedList<>();
         Error = new LinkedList<>();
+        Conjuntos = new LinkedList<>();
+        ExpresionesRegulares = new LinkedList<>();
         fila = 1;
         columna = 0;
         estado = 0;
         auxlex = "";
+        Lexemas=false;
+        conjunto=0;
+        expr =0;
+        conjuntoID="";
+        conjuntoCONTENT="";
+        expresion="";
+        expID="";
         Character c;
         for (int i = 0; i < entrada.length() - 1; i++)
             {
@@ -59,11 +76,24 @@ public class AnalizadorLexico {
                         {
                             auxlex += c;
                             agregarToken(Token.Tipo.DosPuntos);
+                            if(conjunto==1) conjunto=2;
                         }
                         else if (c.compareTo(';') == 0)
                         {
                             auxlex += c;
                             columnaToken = columna;
+                            if(conjunto==4){
+                                Conjuntos.add(new Conjunto(conjuntoID, conjuntoCONTENT));
+                                conjuntoID="";
+                                conjuntoCONTENT="";
+                                conjunto=0;
+                            }else if(expr==2 && conjunto==0 && Lexemas==false){
+                                ExpresionesRegulares.add(new ExpresionRegular(expID, expresion));
+                                System.out.println("-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-/-"+expresion);
+                                expr=0;
+                                expresion="";
+                                expID="";
+                            }
                             agregarToken(Token.Tipo.PuntoYComa);
                         }
                         else if (c.compareTo('{') == 0)
@@ -99,7 +129,7 @@ public class AnalizadorLexico {
                         {
                             auxlex += c;
                             columnaToken = columna;
-                            estado = 7;
+                            estado = 6;
                         }
                         else if (c.compareTo('|') == 0)
                         {
@@ -108,6 +138,12 @@ public class AnalizadorLexico {
                             agregarToken(Token.Tipo.Absoluto);
                         }
                         else if (c.compareTo('<') == 0)
+                        {
+                            auxlex += c;
+                            columnaToken = columna;
+                            estado = 7;
+                        }
+                        else if (c.compareTo('!') == 0)
                         {
                             auxlex += c;
                             columnaToken = columna;
@@ -125,6 +161,12 @@ public class AnalizadorLexico {
                             columnaToken = columna;                 
                             agregarToken(Token.Tipo.enie);
                         }
+                        else if (c.compareTo(',') == 0)
+                        {
+                            auxlex += c;
+                            columnaToken = columna;                 
+                            agregarToken(Token.Tipo.coma);
+                        }
                         else if (c.compareTo('?') == 0)
                         {
                             auxlex += c;
@@ -135,7 +177,7 @@ public class AnalizadorLexico {
                         {
                             auxlex += c;
                             columnaToken = columna;
-                            estado = 11;
+                            estado = 10;
                         }
                         else if (c.compareTo('\n') == 0)
                         {
@@ -188,9 +230,6 @@ public class AnalizadorLexico {
                         {
                             VerificarResevada();
                             i -= 1;
-                            /*agregarError(fila, columna, auxlex, "Desconocido");
-                            agregarError(fila, columna, c.ToString(), "Desconocido");
-                            estado = 0;*/
                         }
                         break;
                     case 3:
@@ -204,15 +243,122 @@ public class AnalizadorLexico {
                             estado = 3;
                             auxlex += c;
                         }
+                        break;
+                    case 5:
+                        if(c.compareTo('/')==0){
+                            auxlex +=c;
+                            agregarToken(Token.Tipo.DobleBarra);
+                            estado = 11;
+                        }
+                        else
+                        {
+                            i -= 1;
+                            System.out.println("Error Léxico con " + c);
+                            agregarError(fila, columna, auxlex, "Desconocido");
+                            agregarError(fila, columna, c.toString(), "Desconocido");
+                            estado = 0;
+                        }
+                        break;
+                    case 6:
+                        if(c.compareTo('>')==0){
+                            auxlex +=c;
+                            agregarToken(Token.Tipo.Flecha);
+                            if(conjunto==3) conjunto=4;
+                            if(expr==1) expr=2; 
+                        }
+                        else
+                        {
+                            i -= 1;
+                            System.out.println("Error Léxico con " + c);
+                            agregarError(fila, columna, auxlex, "Desconocido");
+                            agregarError(fila, columna, c.toString(), "Desconocido");
+                            estado = 0;
+                        }
+                        break;
+                    case 7:
+                        if(c.compareTo('!')==0){
+                            auxlex +=c;
+                            agregarToken(Token.Tipo.BeginCM);
+                            estado = 8;
+                        }
+                        else
+                        {
+                            i -= 1;
+                            System.out.println("Error Léxico con " + c);
+                            agregarError(fila, columna, auxlex, "Desconocido");
+                            agregarError(fila, columna, c.toString(), "Desconocido");
+                            estado = 0;
+                        }
+                        break;
+                    case 8:
+                        if (c.compareTo('!') == 0 )
+                        {
+                            agregarToken(Token.Tipo.cadena);
+                            i -= 1;
+                        }
+                        else
+                        {
+                            estado = 8;
+                            auxlex += c;
+                        }
+                        break;
+                    case 9:
+                        if(c.compareTo('>')==0){
+                            auxlex +=c;
+                            agregarToken(Token.Tipo.EndCM);
+                        }
+                        else
+                        {
+                            i -= 1;
+                            System.out.println("Error Léxico con " + c);
+                            agregarError(fila, columna, auxlex, "Desconocido");
+                            agregarError(fila, columna, c.toString(), "Desconocido");
+                            estado = 0;
+                        }
+                        break;
+                    case 10:
+                        if(c.compareTo('%')==0){
+                            auxlex +=c;
+                            Lexemas=true;
+                            agregarToken(Token.Tipo.DoblePorcentaje);
+                        }
+                        else
+                        {
+                            i -= 1;
+                            System.out.println("Error Léxico con " + c);
+                            agregarError(fila, columna, auxlex, "Desconocido");
+                            agregarError(fila, columna, c.toString(), "Desconocido");
+                            estado = 0;
+                        }
                         break;                        
+                    case 11:
+                        if (c.compareTo('\n') == 0 )
+                        {
+                            auxlex+=c;
+                            agregarToken(Token.Tipo.cadena);
+                        }
+                        else
+                        {
+                            estado = 11;
+                            auxlex += c;
+                        }
+                        break;
                 }
             }
-        return Salida;
+        
+        return new ListasAnalisis(Error, Salida, Conjuntos, ExpresionesRegulares);
     }
     
     
      public void agregarToken(Token.Tipo tipo)
         {
+            if(conjunto==4){
+                conjuntoCONTENT+=auxlex;
+            }
+            if(expr==2){
+                expresion+=auxlex;
+            }
+            
             Salida.addLast(new Token(tipo, auxlex, fila, columnaToken));
             auxlex = "";
             estado = 0;
@@ -302,13 +448,21 @@ public class AnalizadorLexico {
         {
             switch (auxlex)
             {
-                case "class":
+                case "CONJ":
                     agregarToken(Token.Tipo.PR_CONJ);
+                    conjunto=1;
                     break;
                 default:
+                    if(conjunto == 2){
+                        conjunto=3;
+                        conjuntoID=auxlex;
+                    }
+                    if(expr==0 && conjunto==0){
+                        expr=1;
+                        expID = auxlex;
+                    }
                     agregarToken(Token.Tipo.Identificador);
                     break;
-
             }
         }
 
