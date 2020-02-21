@@ -61,6 +61,14 @@ public class Token {
         {
             return columna;
         }
+
+    public void setTipoToken(Tipo tipoToken) {
+        this.tipoToken = tipoToken;
+    }
+
+    public void setValor(String valor) {
+        this.valor = valor;
+    }
     
     public String GetTipo(){
         switch(tipoToken){

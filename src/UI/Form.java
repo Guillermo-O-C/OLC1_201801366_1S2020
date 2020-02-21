@@ -8,7 +8,10 @@ package UI;
 import beans.AnalizadorLexico;
 import beans.ListasAnalisis;
 import beans.Token;
+import java.io.IOException;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
@@ -77,8 +80,12 @@ public class Form extends javax.swing.JFrame {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        // TODO add your handling code here:
-        practica1.Practica1.Analizar(jTextArea1.getText());
+        try {
+            // TODO add your handling code here:
+            practica1.Practica1.Analizar(jTextArea1.getText());
+        } catch (IOException ex) {
+            Logger.getLogger(Form.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }//GEN-LAST:event_jButton1ActionPerformed
 
     /**
