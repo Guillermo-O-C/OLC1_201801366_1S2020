@@ -27,7 +27,7 @@ public class Token {
         Punto,
         Absoluto,
         Kleene,
-        Asterisco,
+        Interrogacion,
         Mas,
         enie,
         cadena,
@@ -100,8 +100,8 @@ public class Token {
                 return "Disyunción";
             case Kleene:
                 return "Cerradura de Kleene";
-            case Asterisco:
-                return "Asterisco";
+            case Interrogacion:
+                return "Signo de Interrogacion";
             case Mas:
                 return "Simbolo Suma";
             case enie:
@@ -149,7 +149,7 @@ public class Token {
                 return 13;
             case Kleene:
                 return 14;
-            case Asterisco:
+            case Interrogacion:
                 return 15;
             case Mas:
                 return 16;

@@ -123,7 +123,7 @@ public class AnalizadorLexico {
                         {
                             auxlex += c;
                             columnaToken = columna;
-                            agregarToken(Token.Tipo.Asterisco);
+                            agregarToken(Token.Tipo.Kleene);
                         }
                         else if (c.compareTo('-') == 0)
                         {
@@ -171,7 +171,7 @@ public class AnalizadorLexico {
                         {
                             auxlex += c;
                             columnaToken = columna;                 
-                            agregarToken(Token.Tipo.Kleene);
+                            agregarToken(Token.Tipo.Interrogacion);
                         }
                         else if (c.compareTo('%') == 0)
                         {
